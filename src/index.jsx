@@ -58,11 +58,11 @@ const FinancialTable = React.createClass({
       // Create the columns.
       for (var i = 0; i < totalCols; i++) {
         cols.push(
-          <Column
+          <Column columnKey={i}
             header={<Cell>{rows[1][i]}</Cell>}
             cell={ props => (
               <Cell>
-                {rows[props.rowIndex][i]}
+                {rows[props.rowIndex][props.columnKey]}
               </Cell>
             )}
             width={200}
