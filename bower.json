@@ -1,0 +1,22 @@
+{
+  "name": "react-spreadsheet-prototype",
+  "description": "React prototype of Spreadsheet Widget",
+  "main": "src/index.jsx",
+  "authors": [
+    "Rise Vision"
+  ],
+  "license": "GPL-3.0",
+  "homepage": "https://github.com/Rise-Vision/react-spreadsheet-prototype",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "webcomponentsjs": "^0.7.22",
+    "rise-google-sheet": "https://github.com/Rise-Vision/rise-google-sheet.git#^1.1.0"
+  }
+}
