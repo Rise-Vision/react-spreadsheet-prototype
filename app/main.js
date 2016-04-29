@@ -25,12 +25,23 @@ const FinancialTable = React.createClass({
     sheet.removeEventListener("rise-google-sheet-response");
   },
 
-  // Convert data to a two-dimensional array of rows.
-  getRows: function() {
-    var rows = [],
-      row = [];
+  getColumnHeaders: function(totalCols) {
+    var headers = [];
 
-    for (var i = 0; i < this.state.data.length; i++) {
+    for (var i = 0; i < totalCols; i += 1) {
+      headers.push(this.state.data[i].content.$t);
+    }
+
+    return headers;
+  },
+
+  // Convert data to a two-dimensional array of rows.
+  getRows: function(totalCols) {
+    var rows = [],
+      row = null;
+
+    for (var i = totalCols; i < this.state.data.length; i++) {
+
       if (this.state.data[i].gs$cell.col === '1') {
         if (row !== null) {
           rows.push(row);
@@ -50,16 +61,18 @@ const FinancialTable = React.createClass({
   render: function() {
     var totalCols = 6,
       rows = null,
+      columnHeaders = null,
       cols = [];
 
     if (this.state.data) {
-      rows = this.getRows();
+      rows = this.getRows(totalCols);
+      columnHeaders = this.getColumnHeaders(totalCols);
 
       // Create the columns.
       for (var i = 0; i < totalCols; i++) {
         cols.push(
           <Column columnKey={i}
-            header={<Cell>{rows[1][i]}</Cell>}
+            header={<Cell>{columnHeaders[i]}</Cell>}
             cell={ props => (
               <Cell>
                 {rows[props.rowIndex][props.columnKey]}
