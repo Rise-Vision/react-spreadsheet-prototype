@@ -1,28 +1,27 @@
-var path = require("path");
-var webpack = require("webpack");
-var packageData = require("./package.json");
-var filename = [packageData.name, "js"];
+var HTMLWebPackPlugin = require("html-webpack-plugin");
+var HTMLWebPackPluginConfig = new HTMLWebPackPlugin({
+  template: __dirname + "/app/index.html",
+  filename: "index.html",
+  inject: "body"
+});
 
 module.exports = {
-  entry: path.resolve(__dirname, packageData.main),
+  entry: [
+    "./app/main.js"
+  ],
   output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: filename.join("."),
+    path: __dirname + "/dist",
+    filename: "react-spreadsheet-prototype.js"
   },
   devtool: "source-map",
   module: {
     loaders: [
       {
-        test: /\.jsx?$/,
-        exclude: /(node_modules)/,
-        loader: "babel",
-        query: {
-          presets: ["es2015", "react"]
-        }
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "babel-loader"
       }
     ]
   },
-  resolve: {
-    extensions: ["", ".js", ".jsx"]
-  },
+  plugins: [HTMLWebPackPluginConfig]
 };
