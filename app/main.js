@@ -86,7 +86,7 @@ const FinancialTable = React.createClass({
       return(
         <Table
           rowHeight={50}
-          rowsCount={104} // Need to set this dynamically.
+          rowsCount={rows.length}
           width={1200}    // rsW
           height={800}   // rsH
           headerHeight={50}>
