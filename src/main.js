@@ -26,9 +26,10 @@ const FinancialTable = React.createClass({
   },
 
   getColumnHeaders: function(totalCols) {
-    var headers = [];
+    var headers = [],
+      startingCell = 1; // account for empty first row of cells except for last cell with current time
 
-    for (var i = 0; i < totalCols; i += 1) {
+    for (var i = startingCell; i < (startingCell + totalCols); i += 1) {
       headers.push(this.state.data[i].content.$t);
     }
 
@@ -38,9 +39,10 @@ const FinancialTable = React.createClass({
   // Convert data to a two-dimensional array of rows.
   getRows: function(totalCols) {
     var rows = [],
-      row = null;
+      row = null,
+      startingCell = totalCols + 1; // account for empty first row of cells and column header cells
 
-    for (var i = totalCols; i < this.state.data.length; i++) {
+    for (var i = startingCell; i < this.state.data.length; i++) {
 
       if (this.state.data[i].gs$cell.col === '1') {
         if (row !== null) {
