@@ -1,5 +1,6 @@
 const React = require("react");
 const ReactDOM = require("react-dom");
+const ResponsiveFixedDataTable = require("responsive-fixed-data-table");
 const {Table, Column, Cell} = require("fixed-data-table");
 
 const sheet = document.querySelector("rise-google-sheet");
@@ -12,9 +13,25 @@ const FinancialTable = React.createClass({
   },
 
   componentDidMount: function() {
+    var $app = $("#app");
+
     sheet.addEventListener("rise-google-sheet-response", function(e) {
       if (e.detail && e.detail.cells) {
         this.setState({ data: e.detail.cells });
+      }
+
+      // Must execute after data is rendered.
+      $(".page").height(this.table.props.rowsCount * this.table.props.rowHeight);
+
+      if ($app.data("plugin_autoScroll") === undefined) {
+        $app.autoScroll({
+          "by": "continuous",
+          "speed": "fastest"
+        }).on("done", function () {
+          $app.data("plugin_autoScroll").play();
+        });
+
+        $app.data("plugin_autoScroll").play();
       }
     }.bind(this));
 
@@ -86,14 +103,16 @@ const FinancialTable = React.createClass({
       }
 
       return(
-        <Table
+        <ResponsiveFixedDataTable
+          ref={(ref) => this.table = ref}
           rowHeight={50}
           rowsCount={rows.length}
           width={1200}    // rsW
           height={800}   // rsH
-          headerHeight={50}>
+          headerHeight={50}
+          overflowY="hidden">
           {cols}
-        </Table>
+        </ResponsiveFixedDataTable>
       );
     }
     else {
@@ -103,5 +122,5 @@ const FinancialTable = React.createClass({
 });
 
 window.addEventListener("WebComponentsReady", function(e) {
-  ReactDOM.render(<FinancialTable />, document.getElementById("app"));
+  ReactDOM.render(<FinancialTable />, document.querySelector(".page"));
 });
