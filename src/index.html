@@ -11,14 +11,26 @@
   <link rel="stylesheet" href="../node_modules/fixed-data-table/dist/fixed-data-table.min.css">
 
   <style>
-    html, body, #app {
+    html, body {
+      height: 100%;
+    }
+
+    .container {
+      width: 1200px;
+      height: 700px;
+    }
+
+    #app {
       height: 100%;
     }
   </style>
 </head>
 <body>
-  <div id="app">
-    <section class="page"></section>
+  <div class="container">
+    <div class="header"></div>
+    <div id="app">
+      <section class="page"></section>
+    </div>
   </div>
 
   <rise-google-sheet key="17s0nUQzBnLPTl0QcGXTkHQK9V4g-5t3l5ZkWjv0w6RM" refresh="60"></rise-google-sheet>
