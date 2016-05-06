@@ -16,7 +16,8 @@
     "tests"
   ],
   "dependencies": {
-    "webcomponentsjs": "^0.7.22",
-    "rise-google-sheet": "https://github.com/Rise-Vision/rise-google-sheet.git#^1.1.0"
+    "auto-scroll": "https://github.com/Rise-Vision/auto-scroll.git#^1.2.0",
+    "rise-google-sheet": "https://github.com/Rise-Vision/rise-google-sheet.git#^1.1.0",
+    "webcomponentsjs": "^0.7.22"
   }
 }
