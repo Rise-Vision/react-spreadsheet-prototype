@@ -5,6 +5,9 @@ const {Table, Column, Cell} = require("fixed-data-table");
 
 const sheet = document.querySelector("rise-google-sheet");
 
+var commonUtils = require("./utils/common");
+var stylingData = require("./data/styling");
+
 const FinancialTableHeader = React.createClass({
   getInitialState: function() {
     return {
@@ -26,6 +29,32 @@ const FinancialTableHeader = React.createClass({
     sheet.removeEventListener("rise-google-sheet-response");
   },
 
+  getColumnWidth: function(columnKey) {
+    var width = stylingData.defaultColumnWidth;
+
+    for (var i = 0; i < stylingData.columns.length; i++) {
+      if (stylingData.columns[i].id === columnKey) {
+        width = stylingData.columns[i].width;
+        break;
+      }
+    }
+
+    return width;
+  },
+
+  getColumnAlignment: function(columnKey) {
+    var alignment = stylingData.body.style.align;
+
+    for (var i = 0; i < stylingData.columns.length; i++) {
+      if (stylingData.columns[i].id === columnKey) {
+        alignment = stylingData.columns[i].style.align;
+        break;
+      }
+    }
+
+    return alignment;
+  },
+
   getColumnHeaders: function(totalCols) {
     var headers = [],
       startingCell = 1; // account for empty first row of cells except for last cell with current time
@@ -35,6 +64,19 @@ const FinancialTableHeader = React.createClass({
     }
 
     return headers;
+  },
+
+  getColumnHeader: function(dataValue, columnKey) {
+    var value = dataValue;
+
+    for (var i = 0; i < stylingData.columns.length; i++) {
+      if (stylingData.columns[i].id === columnKey) {
+        value = stylingData.columns[i].headerText;
+        break;
+      }
+    }
+
+    return value;
   },
 
   render: function () {
@@ -50,8 +92,9 @@ const FinancialTableHeader = React.createClass({
         cols.push(
           <Column
             columnKey={i}
-            header={<Cell>{columnHeaders[i]}</Cell>}
-            width={200}
+            header={<Cell className={stylingData.headers.className}>{this.getColumnHeader(columnHeaders[i], i)}</Cell>}
+            width={this.getColumnWidth(i)}
+            align={this.getColumnAlignment(i)}
           />
         );
       }
@@ -60,9 +103,9 @@ const FinancialTableHeader = React.createClass({
         <Table
           rowHeight={1}
           rowsCount={0}
-          width={1200}    // rsW
-          height={50}   // rsH
-          headerHeight={50}>
+          width={1400}
+          height={stylingData.rows.height}
+          headerHeight={stylingData.rows.height}>
           {cols}
         </Table>
       );
@@ -134,6 +177,51 @@ const FinancialTable = React.createClass({
     return rows;
   },
 
+  getRowClassName: function(index) {
+    // add 1 to index value so the first row is considered odd
+    return ((index + 1) % 2) ? "odd" : "even";
+  },
+
+  getColumnAlignment: function(columnKey) {
+    var alignment = stylingData.body.style.align;
+
+    for (var i = 0; i < stylingData.columns.length; i++) {
+      if (stylingData.columns[i].id === columnKey) {
+        alignment = stylingData.columns[i].style.align;
+        break;
+      }
+    }
+
+    return alignment;
+  },
+
+  getCellClassName: function(columnKey) {
+    var className = stylingData.body.className;
+
+    for (var i = 0; i < stylingData.columns.length; i++) {
+      if (stylingData.columns[i].id === columnKey) {
+        className = "custom_font-style-" + columnKey;
+
+        break;
+      }
+    }
+
+    return className;
+  },
+
+  getColumnWidth: function(columnKey) {
+    var width = stylingData.defaultColumnWidth;
+
+    for (var i = 0; i < stylingData.columns.length; i++) {
+      if (stylingData.columns[i].id === columnKey) {
+        width = stylingData.columns[i].width;
+        break;
+      }
+    }
+
+    return width;
+  },
+
   render: function() {
     var totalCols = 6,
       rows = null,
@@ -146,12 +234,17 @@ const FinancialTable = React.createClass({
       for (var i = 0; i < totalCols; i++) {
         cols.push(
           <Column columnKey={i}
+            width={this.getColumnWidth(i)}
+            align={this.getColumnAlignment(i)}
             cell={ props => (
-              <Cell>
+              <Cell
+                width={props.width}
+                height={props.height}
+                className={this.getCellClassName(props.columnKey)}
+                columnKey={props.columnKey}>
                 {rows[props.rowIndex][props.columnKey]}
               </Cell>
             )}
-            width={200}
           />
         );
       }
@@ -159,9 +252,10 @@ const FinancialTable = React.createClass({
       return(
         <ResponsiveFixedDataTable
           ref={(ref) => this.table = ref}
-          rowHeight={50}
+          rowHeight={stylingData.rows.height}
           rowsCount={rows.length}
-          width={1200}    // rsW
+          rowClassNameGetter={this.getRowClassName}
+          width={1400}    // rsW
           height={700}   // rsH
           headerHeight={0}
           overflowY="hidden">
@@ -176,6 +270,34 @@ const FinancialTable = React.createClass({
 });
 
 window.addEventListener("WebComponentsReady", function(e) {
+
+  var fontSettings = [{
+    "class": stylingData.headers.className,
+    "fontStyle": stylingData.headers.style
+  },{
+    "class": stylingData.body.className,
+    "fontStyle": stylingData.body.style
+  }];
+
+  // add column header and body rules
+  fontSettings.forEach(function (setting) {
+    commonUtils.addCSSRules([ commonUtils.getFontCssStyle(setting.class, setting.fontStyle) ]);
+  });
+
+  // add row background colour rules
+  commonUtils.addCSSRules([
+    ".even" + " div * {background-color: " + stylingData.rows.colors.even + " !important }",
+    ".odd" + " div * {background-color: " + stylingData.rows.colors.odd + " !important }"
+  ]);
+
+  // add any custom column body rules
+  stylingData.columns.forEach(function (column) {
+    commonUtils.addCSSRules([
+      commonUtils.getFontCssStyle("custom_font-style-" + column.id, column.style),
+      ".custom_font-style-" + column.id + " .fixedDataTableCellLayout_wrap3 {vertical-align: " + column.verticalAlign + " }"
+    ]);
+  });
+
   ReactDOM.render(<FinancialTableHeader />, document.querySelector(".header"));
   ReactDOM.render(<FinancialTable />, document.querySelector(".page"));
 });
